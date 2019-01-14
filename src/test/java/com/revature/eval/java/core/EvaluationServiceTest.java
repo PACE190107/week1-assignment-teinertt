@@ -479,7 +479,7 @@ public class EvaluationServiceTest {
 
 	@Test
 	public void testEncodeNumbers() {
-		assertEquals("gvhgr mt123 gvhgr mt", EvaluationService.AtbashCipher.encode("Testing,1 2 3, testing."));
+		assertEquals("gvhgr mt123 gvhgr mt", EvaluationService.AtbashCipher.encode("Testing, 1 2 3, testing."));
 	}
 
 	@Test
