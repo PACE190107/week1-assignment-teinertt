@@ -1,13 +1,23 @@
 package com.revature.eval.java.core;
 
 import java.lang.reflect.Array;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class EvaluationService {
 
@@ -306,27 +316,29 @@ public class EvaluationService {
 		private List<T> sortedList;
 
 		public int indexOf(T t) {
-			List<Integer> myList = new ArrayList<Integer>();
-			
+			List<T> myList = new ArrayList<T>();
+			myList = sortedList;
 			Integer first = 0; //beginning of list
-			Integer last = myList.lastIndexOf(t)+1; // end of list
+			Integer last = myList.size(); // end of list
 			Integer mid = ((first+last)/2); // middle of list
 			
-			if(myList.get(mid).equals(t)) {
+			
+			while((Integer) myList.get(mid) != t){
+			
+				 if(myList.get(mid).equals(t)) {
 					return mid;
 				}
-				while(mid != t) {
 					
-				if(mid.compareTo((Integer) t)> mid){
-				last = mid;
-				mid = (first+last)/2;
-			}
-			else if (mid.compareTo((Integer) t) < mid) {
+				if((Integer) t < (Integer) myList.get(mid)){
+					last = mid;
+					mid = (first+last)/2;
+				}
+				else if ((Integer) t > (Integer) myList.get(mid)) {
 				first = mid;
 				mid = (first+last)/2;
-			}			
-				}
-					return myList.indexOf(mid);	
+				}			
+			}
+					return mid;	
 		}
 
 		public BinarySearch(List<T> sortedList) {
@@ -370,7 +382,6 @@ public class EvaluationService {
 	public String toPigLatin(String string) {
 
 		String word = string;	
-		String convert = new String();
 		String[] pl = word.split(" ");
 		StringBuilder words = new StringBuilder(word);
 		int vIndex=0;
@@ -380,8 +391,20 @@ public class EvaluationService {
 		
 		for(int i=0; i<pl.length; i++) {
 			for(int j=0; j<pl[i].length(); j++) {
-				if(pl[i].charAt(j) == 'a' || pl[i].charAt(j) =='e' || pl[i].charAt(j) =='i' || 
-					pl[i].charAt(j) =='o' || pl[i].charAt(j) =='u') {
+				if(pl[i].charAt(j)=='u' && pl[i].charAt(j+1) == 'i') {
+					
+					vIndex=(int)j+inc2+1;
+					String vow = words.substring(vIndex, pl[i].length()+inc3);
+					String cons = words.substring(inc, vIndex);
+					inc += pl[i].length()+1;
+					inc2 += pl[i].length()+1;
+					inc3 += pl[i].length()+1;
+					pl[i] = vow+cons+"ay";
+					
+					break;
+				}
+					else if (pl[i].charAt(j) == 'a' || pl[i].charAt(j) =='e' || pl[i].charAt(j) =='i' || 
+						pl[i].charAt(j) =='o' || pl[i].charAt(j) =='u') {
 					
 					vIndex=(int)j+inc2;
 					String vow = words.substring(vIndex, pl[i].length()+inc3);
@@ -389,14 +412,24 @@ public class EvaluationService {
 					inc += pl[i].length()+1;
 					inc2 += pl[i].length()+1;
 					inc3 += pl[i].length()+1;
-					convert += vow+cons+"ay";
+					pl[i] = vow+cons+"ay";
 					
 					break;
 				}
+				}
 			}
 			
-		}
-		return convert;
+		
+		for(int i=0; i<pl.length; i++)
+			System.out.println(pl[i]);
+		
+		
+		String finish = Arrays.toString(pl);
+		String finished = finish.replace("[", "").replace("]", "").replaceAll(",", "");
+		
+		
+		
+		return finished;
 	}
 	/**
 	 * 9. An Armstrong number is a number that is the sum of its own digits each
@@ -460,21 +493,16 @@ public class EvaluationService {
 		List<Long> num = new ArrayList<>();
 		int n = (int) l;
 		int i = 0;
-		
-		 // Print the number of 2s that divide n 
+
         while (n%2==0) 
         { 
         	num.add(i, (long) 2);
-        	i++;
-        	 
+        	i++;    	 
             n /= 2; 
         } 
   
-        // n must be odd 
-        
         for ( int j = 3; j <= Math.sqrt(n); j+= 2) 
-        { 
-            
+        {     
             while (n%j == 0) 
             { 
             	num.add(i, (long) j);
@@ -484,12 +512,10 @@ public class EvaluationService {
         } 
   
         
-        // n is a prime number greater than 2 
-        if (n > 2) {
+      if (n > 2) {
             num.add(i, (long) n);
         }
-        
-		
+        	
 		return num;
 	}
 
@@ -783,8 +809,19 @@ public class EvaluationService {
 	 * @return
 	 */
 	public Temporal getGigasecondDate(Temporal given) {
-		// TODO Write an implementation for this method declaration
-		return null;
+	    
+	    if(given.isSupported(ChronoUnit.SECONDS)) {
+	    	LocalDateTime newLocd = (LocalDateTime) given; 
+	    	LocalDateTime newDate = newLocd.plus(Duration.ofSeconds(1000000000));
+	    	return newDate;
+	    }
+	    else {
+	    	LocalDate newLocd = (LocalDate) given; 
+	    	LocalDateTime ldt = newLocd.atStartOfDay();
+	    	LocalDateTime newDate = ldt.plus(Duration.ofSeconds(1000000000));
+	    	return newDate;
+	    }
+		
 	}
 
 	/**
@@ -801,8 +838,26 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int getSumOfMultiples(int i, int[] set) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+
+		int[] given = set;
+		int toNum = i;
+		Set<Integer> hSet = new HashSet<Integer>() ;
+		int[] nums = {0, 0, 0};
+		int sum2=0;
+
+		
+		for(int j=0; j<given.length; j++) {
+			while((nums[j]+given[j])<toNum) {
+			 nums[j] += given[j]; 
+			 
+			 hSet.add(nums[j]);
+			}
+		
+		}
+		for( int sum : hSet) {
+			sum2+= sum;
+		}
+		return sum2;
 	}
 
 	/**
@@ -844,28 +899,28 @@ public class EvaluationService {
 	public boolean isLuhnValid(String string) {
 
 		String nums = string;
-		String concat = nums.replaceAll("\\s", "");
+		String number = nums.replaceAll("\\s", "");
 		int sum1=0;
 		int sum2=0;
 		int sumCheck=0;
 		//still need to check for invalid chars
 		
-		for(int i=0; i<concat.length(); i++) {
-			if(Character.isLetter(concat.charAt(i))) {
+		for(int i=0; i<number.length(); i++) {
+			if(Character.isLetter(number.charAt(i))) {
 				return false;
 			}
 		}
 		
-		for(int i=concat.length()-2; i>0; i--) {
-			if((Character.getNumericValue(concat.charAt(i)))*2 > 9){
-				sumCheck = ((Character.getNumericValue(concat.charAt(i)))*2)-9;
+		for(int i=number.length()-2; i>0; i--) {
+			if((Character.getNumericValue(number.charAt(i)))*2 > 9){
+				sumCheck = ((Character.getNumericValue(number.charAt(i)))*2)-9;
 				sum1 = sum1 + sumCheck;
-				sum2 = sum2 + Character.getNumericValue(concat.charAt(i+1));
+				sum2 = sum2 + Character.getNumericValue(number.charAt(i+1));
 				i--;
 			}
 			else {
-			 sum1 = sum1 + (Character.getNumericValue(concat.charAt(i)))*2;
-			 sum2 = sum2 + Character.getNumericValue(concat.charAt(i+1));
+			 sum1 = sum1 + (Character.getNumericValue(number.charAt(i)))*2;
+			 sum2 = sum2 + Character.getNumericValue(number.charAt(i+1));
 			 i--;
 			}
 		}
@@ -908,8 +963,35 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int solveWordProblem(String string) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+
+		int sum = 0;
+		int sum2 = 0;
+		String problem = string.replaceAll("\\?", "");
+		String[] solve = problem.split(" ");
+		
+		sum = Integer.parseInt(solve[2]);
+		if(Character.isLetter(solve[4].charAt(0))) {
+			sum2 = Integer.parseInt(solve[5]);
+		}
+		else {
+			sum2 = Integer.parseInt(solve[4]);
+		}
+		
+		switch (solve[3]) {
+		
+		case "multiplied": sum = sum*sum2;
+		break;
+		
+		case "plus": sum = sum+sum2;
+		break;
+		
+		case "minus": sum = sum-sum2;
+		break;
+		
+		case "divided": sum = sum/sum2;
+		break;
+		}
+		return sum;
 	}
 
 }
